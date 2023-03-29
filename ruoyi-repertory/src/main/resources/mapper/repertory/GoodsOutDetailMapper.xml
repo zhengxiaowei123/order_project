@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.repertory.mapper.GoodsOutDetailMapper">
+
+    <resultMap type="GoodsOutDetail" id="GoodsOutDetailResult">
+        <result property="id" column="id"/>
+        <result property="outId" column="out_id"/>
+        <result property="goodsId" column="goods_id"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyDate" column="modify_date"/>
+        <result property="outQuantity" column="out_quantity"/>
+        <result property="outPrice" column="out_price"/>
+    </resultMap>
+
+    <sql id="selectGoodsOutDetailVo">
+        select id, out_id, goods_id, create_date, modify_date, out_quantity, out_price
+        from goods_out_detail
+    </sql>
+
+    <select id="selectGoodsOutDetailList" parameterType="GoodsOutDetail" resultMap="GoodsOutDetailResult">
+        <include refid="selectGoodsOutDetailVo"/>
+        <where>
+            <if test="outId != null ">and out_id = #{outId}</if>
+            <if test="goodsId != null ">and goods_id = #{goodsId}</if>
+            <if test="createDate != null ">and create_date = #{createDate}</if>
+            <if test="modifyDate != null ">and modify_date = #{modifyDate}</if>
+            <if test="outQuantity != null  and outQuantity != ''">and out_quantity = #{outQuantity}</if>
+            <if test="outPrice != null ">and out_price = #{outPrice}</if>
+        </where>
+    </select>
+
+    <select id="selectGoodsOutDetailById" parameterType="Long" resultType="com.ruoyi.repertory.vo.GoodsOutDetailVo">
+        SELECT d.id,
+               d.out_id      as outId,
+               d.goods_id    as goodsId,
+               d.create_date as createDate,
+               d.modify_date    modifyDate,
+               d.out_quantity   outQuantity,
+               d.out_price      outPrice,
+               r.price,
+               r.unit,
+               d.out_quantity/nullif(r.sku,0) as outBox,
+               r.quanltity,
+               r.sku,
+               r.name,
+               r.price*d.out_quantity as outTotalPrice
+        FROM goods_out_detail d
+        LEFT JOIN repertory r ON d.goods_id = r.id
+        WHERE d.id = #{id}
+    </select>
+    <select id="selectGoodsOutDetailByOutId" resultType="com.ruoyi.repertory.vo.GoodsOutDetailVo">
+        SELECT d.id,
+               d.out_id      as outId,
+               d.goods_id    as goodsId,
+               d.create_date as createDate,
+               d.modify_date    modifyDate,
+               d.out_quantity   outQuantity,
+               d.out_price      outPrice,
+               r.price,
+               r.unit,
+               d.out_quantity/nullif(r.sku,0) as outBox,
+               r.quanltity,
+               r.sku,
+               r.name as goodsName,
+               d.out_price*d.out_quantity as outTotalPrice,
+               o.consignee
+        FROM goods_out_detail d
+                 LEFT JOIN repertory r ON d.goods_id = r.id
+                 LEFT JOIN goods_out o on o.id = d.out_id
+        WHERE d.out_id = #{id}
+
+
+    </select>
+    <select id="export" resultType="com.ruoyi.repertory.vo.GoodsOutDetailExcel">
+        SELECT d.id,
+               d.out_id      as outId,
+               d.goods_id    as goodsId,
+               d.create_date as createDate,
+               d.modify_date    modifyDate,
+               d.out_quantity   outQuantity,
+               d.out_price      outPrice,
+               r.price,
+               r.unit,
+               d.out_quantity/nullif(r.sku,0) as outBox,
+               r.quanltity,
+               r.sku,
+               r.name as goodsName,
+               d.out_price*d.out_quantity as outTotalPrice,
+               o.consignee
+        FROM goods_out_detail d
+                 LEFT JOIN repertory r ON d.goods_id = r.id
+                 LEFT JOIN goods_out o on o.id = d.out_id
+        WHERE d.out_id = #{outId}
+
+    </select>
+
+    <insert id="insertGoodsOutDetail" parameterType="GoodsOutDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into goods_out_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outId != null">out_id,</if>
+            <if test="goodsId != null">goods_id,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="modifyDate != null">modify_date,</if>
+            <if test="outQuantity != null">out_quantity,</if>
+            <if test="outPrice != null">out_price,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outId != null">#{outId},</if>
+            <if test="goodsId != null">#{goodsId},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="modifyDate != null">#{modifyDate},</if>
+            <if test="outQuantity != null">#{outQuantity},</if>
+            <if test="outPrice != null">#{outPrice},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGoodsOutDetail" parameterType="GoodsOutDetail">
+        update goods_out_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outId != null">out_id = #{outId},</if>
+            <if test="goodsId != null">goods_id = #{goodsId},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="modifyDate != null">modify_date = #{modifyDate},</if>
+            <if test="outQuantity != null">out_quantity = #{outQuantity},</if>
+            <if test="outPrice != null">out_price = #{outPrice},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGoodsOutDetailById" parameterType="Long">
+        delete
+        from goods_out_detail
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteGoodsOutDetailByIds" parameterType="String">
+        delete from goods_out_detail where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

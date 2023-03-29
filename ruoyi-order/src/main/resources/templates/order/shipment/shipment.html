@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('订单管理列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>商品名称：</label>
+                                <input type="text" name="goodsName"/>
+                            </li>
+                            <li>
+                                <label>商品id：</label>
+                                <input type="text" name="goodsId"/>
+                            </li>
+                            <li>
+                                <label>供货商id：</label>
+                                <input type="text" name="supplierId"/>
+                            </li>
+                            <li>
+                                <label>供货商名称：</label>
+                                <input type="text" name="supplierName"/>
+                            </li>
+                            <li>
+                                <label>配送地址id：</label>
+                                <input type="text" name="targetAddressId"/>
+                            </li>
+                            <li>
+                                <label>配送地址：</label>
+                                <input type="text" name="targetAddress"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="order:shipment:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="order:shipment:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="order:shipment:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="order:shipment:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+                <span style="color:red ">暂时完善功能：列表和新增。后续可增加商品管理列表，供应商管理列表，发货地址管理，以及生成发货单等功能。</span>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('order:shipment:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('order:shipment:remove')}]];
+        var prefix = ctx + "order/shipment";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "订单管理",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                },
+                {
+                    field: 'goodsName',
+                    title: '商品名称'
+                },
+                {
+                    field: 'goodsId',
+                    title: '商品id'
+                },
+                {
+                    field: 'supplierId',
+                    title: '供货商id'
+                },
+                {
+                    field: 'supplierName',
+                    title: '供货商名称'
+                },
+                {
+                    field: 'targetAddressId',
+                    title: '配送地址id'
+                },
+                {
+                    field: 'targetAddress',
+                    title: '配送地址'
+                },
+                {
+                    field: 'remark',
+                    title: '备注'
+                },
+                {
+                    field: 'status',
+                    title: '1正常 0 删除'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

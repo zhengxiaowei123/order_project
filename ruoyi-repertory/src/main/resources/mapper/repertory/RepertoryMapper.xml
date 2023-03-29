@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.repertory.mapper.RepertoryMapper">
+    
+    <resultMap type="Repertory" id="RepertoryResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+        <result property="description"    column="description"    />
+        <result property="boxQuanltity"    column="box_quanltity"    />
+        <result property="price"    column="price"    />
+        <result property="unit"    column="unit"    />
+        <result property="quanltity"    column="quanltity"    />
+        <result property="boxTotalPrice"    column="box_total_price"    />
+        <result property="putDate"    column="put_date"    />
+        <result property="sku"    column="sku"    />
+    </resultMap>
+
+    <sql id="selectRepertoryVo">
+        select id, name, code, description, box_quanltity, price, unit, quanltity, box_total_price, put_date, sku from repertory
+    </sql>
+
+    <select id="selectRepertoryList" parameterType="Repertory" resultMap="RepertoryResult">
+        <include refid="selectRepertoryVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="boxQuanltity != null "> and box_quanltity = #{boxQuanltity}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="unit != null  and unit != ''"> and unit = #{unit}</if>
+            <if test="quanltity != null  and quanltity != ''"> and quanltity = #{quanltity}</if>
+            <if test="boxTotalPrice != null "> and box_total_price = #{boxTotalPrice}</if>
+            <if test="putDate != null "> and put_date = #{putDate}</if>
+            <if test="sku != null "> and sku = #{sku}</if>
+        </where>
+    </select>
+    
+    <select id="selectRepertoryById" parameterType="Long" resultMap="RepertoryResult">
+        <include refid="selectRepertoryVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertRepertory" parameterType="Repertory" useGeneratedKeys="true" keyProperty="id">
+        insert into repertory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="code != null">code,</if>
+            <if test="description != null">description,</if>
+            <if test="boxQuanltity != null">box_quanltity,</if>
+            <if test="price != null">price,</if>
+            <if test="unit != null">unit,</if>
+            <if test="quanltity != null">quanltity,</if>
+            <if test="boxTotalPrice != null">box_total_price,</if>
+            <if test="putDate != null">put_date,</if>
+            <if test="sku != null">sku,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="code != null">#{code},</if>
+            <if test="description != null">#{description},</if>
+            <if test="boxQuanltity != null">#{boxQuanltity},</if>
+            <if test="price != null">#{price},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="quanltity != null">#{quanltity},</if>
+            <if test="boxTotalPrice != null">#{boxTotalPrice},</if>
+            <if test="putDate != null">#{putDate},</if>
+            <if test="sku != null">#{sku},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRepertory" parameterType="Repertory">
+        update repertory
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="boxQuanltity != null">box_quanltity = #{boxQuanltity},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="quanltity != null">quanltity = #{quanltity},</if>
+            <if test="boxTotalPrice != null">box_total_price = #{boxTotalPrice},</if>
+            <if test="putDate != null">put_date = #{putDate},</if>
+            <if test="sku != null">sku = #{sku},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRepertoryById" parameterType="Long">
+        delete from repertory where id = #{id}
+    </delete>
+
+    <delete id="deleteRepertoryByIds" parameterType="String">
+        delete from repertory where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.repertory.mapper.GoodsOutMapper">
+    
+    <resultMap type="GoodsOut" id="GoodsOutResult">
+        <result property="id"    column="id"    />
+        <result property="consignee"    column="consignee"    />
+        <result property="outDate"    column="out_date"    />
+        <result property="code"    column="code"    />
+        <result property="totalPrice"    column="total_price"    />
+    </resultMap>
+
+    <sql id="selectGoodsOutVo">
+        select id, consignee, out_date, code, total_price from goods_out
+    </sql>
+
+    <select id="selectGoodsOutList" parameterType="GoodsOut" resultMap="GoodsOutResult">
+        <include refid="selectGoodsOutVo"/>
+        <where>  
+            <if test="consignee != null  and consignee != ''"> and consignee = #{consignee}</if>
+            <if test="outDate != null  and outDate != ''"> and out_date = #{outDate}</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
+        </where>
+    </select>
+    
+    <select id="selectGoodsOutById" parameterType="Long" resultMap="GoodsOutResult">
+        <include refid="selectGoodsOutVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertGoodsOut" parameterType="GoodsOut" useGeneratedKeys="true" keyProperty="id">
+        insert into goods_out
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="consignee != null">consignee,</if>
+            <if test="outDate != null">out_date,</if>
+            <if test="code != null">code,</if>
+            <if test="totalPrice != null">total_price,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="consignee != null">#{consignee},</if>
+            <if test="outDate != null">#{outDate},</if>
+            <if test="code != null">#{code},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGoodsOut" parameterType="GoodsOut">
+        update goods_out
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="consignee != null">consignee = #{consignee},</if>
+            <if test="outDate != null">out_date = #{outDate},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGoodsOutById" parameterType="Long">
+        delete from goods_out where id = #{id}
+    </delete>
+
+    <delete id="deleteGoodsOutByIds" parameterType="String">
+        delete from goods_out where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

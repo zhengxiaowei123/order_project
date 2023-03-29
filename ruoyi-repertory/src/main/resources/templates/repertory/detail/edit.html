@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('修改出货商品详情')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <th:block th:include="include :: select2-css"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-detail-edit" th:object="${goodsOutDetail}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出库单编号：</label>
+            <div class="col-sm-8">
+                <input name="outId" th:value="${goodsOutDetail.outId}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">商品名称：</label>
+            <div class="col-xs-8">
+                <select id="goodsId" name="goodsId" class="form-control">
+                    <!--                        <option value="">请选择商品</option>-->
+                    <option th:each="goods:${goodsList}" th:value="${goods.id}" th:text="${goods.name}"
+                            th:attr="data-unit=${goods.unit},
+                            data-price=${goods.price},
+                            data-sku=${goods.sku},
+                            data-quantity=${goods.quanltity}"
+                            th:selected="${goods.id==goodsOutDetail.goodsId}"
+                    ></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单位：</label>
+            <div class="col-sm-8">
+                <input readonly name="unit" id="unit" class="form-control" type="text" th:field="*{unit}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出货数量：</label>
+            <div class="col-sm-8">
+                <input onchange="changeQuantity(this)" name="outQuantity" id="outQuantity" th:field="*{outQuantity}"
+                       class="form-control" type="text">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">规格：</label>
+            <div class="col-sm-8">
+                <input readonly name="sku" id="sku" class="form-control" type="text" th:field="*{sku}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出货箱数：</label>
+            <div class="col-sm-8">
+                <input readonly name="outBox" id="outBox" class="form-control" type="text" th:field="*{outBox}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出货单价：</label>
+            <div class="col-sm-8">
+                <input readonly name="outPrice" id="outPrice" th:field="*{outPrice}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">出货总价：</label>
+            <div class="col-sm-8">
+                <input readonly name="outTotalPrice" id="outTotalPrice" class="form-control" type="text"
+                       th:field="*{outTotalPrice}">
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<th:block th:include="include :: select2-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "repertory/detail";
+    $("#form-detail-edit").validate({
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-detail-edit').serialize());
+        }
+    }
+
+    $(function () {
+        $('#goodsId').select2({
+            placeholder: "请选择商品",
+            allowClear: true,
+            search: true
+        });
+    })
+
+    $('#goodsId').on('select2:select', function (e) {
+        let unit = $('#goodsId').find('option:selected').data('unit');
+        let price = $('#goodsId').find('option:selected').data('price');
+        let sku = $('#goodsId').find('option:selected').data('sku');
+        let quantity = $('#goodsId').find('option:selected').data('quantity');
+        console.log("quantity", quantity)
+        $("#outPrice").val(price)
+        $("#unit").val(unit)
+        $("#sku").val(sku)
+        $("#outQuantity").val(quantity)
+        if (sku && quantity) {
+            $("#outBox").val(quantity / sku)
+        }
+        if (!sku) {
+            $("#outBox").val(null)
+        }
+        if (price && quantity) {
+            $("#outTotalPrice").val(quantity * price)
+        }
+    });
+
+
+    function changeQuantity(that) {
+        let quantity = $(that).val();
+        console.log("changeQuantity", quantity)
+        let outPrice = $("#outPrice").val()
+        let sku = $("#sku").val()
+        if (sku && quantity) {
+            console.log("1===")
+            $("#outBox").val(quantity / sku)
+        }
+        if (!sku) {
+            $("#outBox").val(null)
+        }
+        if (outPrice && quantity) {
+            console.log("2===")
+            $("#outTotalPrice").val(quantity * outPrice)
+        }
+    }
+
+</script>
+</body>
+</html>
